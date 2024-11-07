@@ -108,6 +108,10 @@ elif page == "About Us":
     ## Clara Okafor
 
     FE/23/96598382
+
+    COHORT 2
+
+    Learning Track : UI/UX
     """)
 
 # Important Information page
