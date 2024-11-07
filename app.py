@@ -58,13 +58,22 @@ Inspired by the need to help farmers optimize yield and manage resources, partic
     if st.button("Predict"):
         # Prepare input features for the model
         input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
-        prediction = model.predict(input_features)
         
-        # Convert the predicted label back to the crop name using the encoder
-        predicted_crop = encoder.inverse_transform(prediction)
-        
-        # Display the result
-        st.write(f"Recommended Crop: {predicted_crop[0]}")
+        # Check if input features have valid values (not NaN or infinite)
+        if np.any(np.isnan(input_features)) or np.any(np.isinf(input_features)):
+            st.error("Please ensure all input fields are filled and contain valid numbers.")
+        else:
+            # Reshape the input for the model if necessary (for one prediction)
+            input_features = input_features.reshape(1, -1)  # Ensures it is a 2D array (1 sample, multiple features)
+
+            # Make the prediction
+            prediction = model.predict(input_features)
+            
+            # Convert the predicted label back to the crop name using the encoder
+            predicted_crop = encoder.inverse_transform(prediction)
+            
+            # Display the result
+            st.write(f"Recommended Crop: {predicted_crop[0]}")
 
     # Like button
     if st.button("Like ❤️"):
