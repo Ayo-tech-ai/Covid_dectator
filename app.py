@@ -57,7 +57,7 @@ Inspired by the need to help farmers optimize yield and manage resources, partic
     # Submit button to make predictions
     if st.button("Predict"):
         # Prepare input features for the model
-        input_features = [[N, P, K, temperature, humidity, ph, rainfall]]
+        input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
         prediction = model.predict(input_features)
         
         # Convert the predicted label back to the crop name using the encoder
