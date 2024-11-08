@@ -2,7 +2,6 @@
 import streamlit as st
 import joblib
 import numpy as np
-import scikit-learn== 1.3.0
 
 # Load the model and encoder (Ensure that the joblib files are in the correct path)
 model = joblib.load("CropRec.joblib")
