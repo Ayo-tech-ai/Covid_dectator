@@ -4,17 +4,15 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 import os
-import requests
+import gdown  # Use this instead of requests
 
-# Direct download link to your model
-MODEL_URL = "https://drive.google.com/uc?export=download&id=1bn7AyyQ8Ebp553WLWYU6p4OshKfUC010"
+# Google Drive file ID
+FILE_ID = "1bn7AyyQ8Ebp553WLWYU6p4OshKfUC010"
 MODEL_PATH = "my2_cnn_lung_model.keras"
 
-# Download the model if it's not already downloaded
+# Download the model if it doesn't exist
 if not os.path.exists(MODEL_PATH):
-    with open(MODEL_PATH, "wb") as f:
-        response = requests.get(MODEL_URL)
-        f.write(response.content)
+    gdown.download(f"https://drive.google.com/uc?id={FILE_ID}", MODEL_PATH, quiet=False)
 
 # Load the model
 model = load_model(MODEL_PATH)
