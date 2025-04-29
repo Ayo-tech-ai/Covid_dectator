@@ -1,134 +1,42 @@
-# Import necessary libraries
 import streamlit as st
-import joblib
 import numpy as np
+from PIL import Image
+from tensorflow.keras.models import load_model
+import tensorflow as tf
 
-# Load the model and encoder (Ensure that the joblib files are in the correct path)
-model = joblib.load("CropRec.joblib")
-encoder = joblib.load('CropRec_LabelEncoder.joblib')
+# Load the model
+model = load_model("my2_cnn_lung_model.keras")
 
-# Sidebar for page navigation
-page = st.sidebar.selectbox("Select a page", ["Home", "About Us", "Important Information"])
+# Define class names
+class_names = ['COVID', 'Normal']
 
-# Home page for crop recommendation
-if page == "Home":
-    st.markdown("<h1 style='text-align: center;'>AI-Powered Crop Recommendation Model</h1>", unsafe_allow_html=True)
-    st.markdown(
-    """
-    <style>
-    /* Main page background color */
-    .stApp {
-        background-color: #A8E6A1; /* Light green */
-    }
-    
-    /* Sidebar background color */
-    .css-1d391kg { 
-        background-color: #BDFCC9; /* Mint green for sidebar */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# App title
+st.title("AI COVID Lung Detection System")
 
-    st.sidebar.markdown("""
-## Project Description
+# Upload image
+uploaded_file = st.file_uploader("Upload a chest X-ray image", type=["jpg", "jpeg", "png"])
 
-The AI-Powered Crop Recommendation Model uses advanced machine learning techniques to provide farmers with customized crop suggestions based on soil and environmental factors. 
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-Inspired by the need to help farmers optimize yield and manage resources, particularly in climate-challenged areas, this project aims to boost agricultural productivity and promote sustainable practices. It emphasizes the importance of technology in connecting traditional farming with modern techniques, ultimately enhancing food security and economic stability for farming communities.
-""")
+    # Preprocess image
+    image = image.resize((180, 180))
+    image_array = np.array(image) / 255.0
+    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
 
-    # Input fields for the seven features in a compact layout
-    col1, col2, col3 = st.columns(3)
+    # Predict
+    prediction = model.predict(image_array)[0]
+    confidence = float(np.max(prediction)) * 100
+    predicted_class = class_names[np.argmax(prediction)]
 
-    with col1:
-        N = st.number_input("Nitrogen Content (N)", min_value=0, max_value=171)
-        temperature = st.number_input("Temperature (°C)", min_value=10.0, max_value=44.0)
-        ph = st.number_input("pH Level", min_value=4.0, max_value=8.0)
+    # Display result
+    st.markdown(f"### Prediction: **{predicted_class}**")
+    st.markdown(f"**Confidence:** {confidence:.2f}%")
 
-    with col2:
-        P = st.number_input("Phosphorous Content (P)", min_value=5, max_value=112)
-        humidity = st.number_input("Humidity (%)", min_value=30.0, max_value=100.0)
+    if st.button("Like"):
+        st.success("Thanks for your support!")
 
-    with col3:
-        K = st.number_input("Potassium Content (K)", min_value=5, max_value=107)
-        rainfall = st.number_input("Rainfall (mm)", min_value=20.0, max_value=1708.0)
-
-    # Submit button to make predictions
-    if st.button("Predict"):
-        # Prepare input features for the model
-        input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
-        
-        # Check if input features have valid values (not NaN or infinite)
-        if np.any(np.isnan(input_features)) or np.any(np.isinf(input_features)):
-            st.error("Please ensure all input fields are filled and contain valid numbers.")
-        else:
-            # Reshape the input for the model if necessary (for one prediction)
-            input_features = input_features.reshape(1, -1)  # Ensures it is a 2D array (1 sample, multiple features)
-
-            # Make the prediction
-            prediction = model.predict(input_features)
-            
-            # Convert the predicted label back to the crop name using the encoder
-            predicted_crop = encoder.inverse_transform(prediction)
-            
-            # Display the result
-            st.write(f"Recommended Crop: {predicted_crop[0]}")
-
-    # Like button
-    if st.button("Like ❤️"):
-        st.success("Thank you for liking the model!")
-
-    # Additional information at the bottom of the home page
-    st.write("""
-    ---
-    **Important Information**  
-    Please ensure that you provide accurate inputs for nitrogen, phosphorous, potassium, temperature, humidity, pH, and rainfall.  
-    This model is designed for general recommendations of just 20 crops in Nigeria and may not capture specific local conditions.  
-    Consult with local agronomists for additional guidance.
-    """)
-
-# About Us page
-elif page == "About Us":
-    st.title("About Us")
-    st.write("""
-    Welcome to the AI-Powered Crop Recommendation Model. 
-    This tool is designed to help farmers make informed decisions on crop selection based on soil and climate conditions.
-    Our mission is to support sustainable agriculture through advanced technology.
-
-    ## MEET THE TEAM
-    
-    ### AYOOLA MUJIB AYODELE
-    
-    FE/23/89361170
-
-    COHORT 2
-
-    Learning Track : AI and ML
-    
-    ## Faustina Ndidiamaka Egbe
-
-    FE/23/83253976
-
-    COHORT 2
-
-    Learning Track : Data analysis and Visualization
-
-    ## Clara Okafor
-
-    FE/23/96598382
-
-    COHORT 2
-
-    Learning Track : UI/UX
-    """)
-
-# Important Information page
-elif page == "Important Information":
-    st.title("Important Information")
-    st.write("""
-    Please ensure that you provide accurate inputs for nitrogen, phosphorous, potassium, temperature, humidity, pH, and rainfall.
-    This model is designed for general recommendations and may not capture specific local conditions.
-    
-    Consult with local agronomists for additional guidance.
-    """)
+# Footer
+st.markdown("---")
+st.markdown("This tool is for educational purposes only and not a substitute for professional medical advice.")
