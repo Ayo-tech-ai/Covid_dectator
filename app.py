@@ -4,11 +4,11 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 import os
-import gdown  # Use this instead of requests
+import gdown  # Used to download from Google Drive
 
-# Google Drive file ID
-FILE_ID = "1bn7AyyQ8Ebp553WLWYU6p4OshKfUC010"
-MODEL_PATH = "my2_cnn_lung_model.keras"
+# Google Drive file ID for the .h5 model
+FILE_ID = "1eLk7CUpfx5ZnTcoiV6w-ecuI4JfzKXIS"
+MODEL_PATH = "my1_cnn_lung_model.h5"
 
 # Download the model if it doesn't exist
 if not os.path.exists(MODEL_PATH):
