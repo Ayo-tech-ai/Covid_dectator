@@ -20,7 +20,7 @@ if not os.path.exists(MODEL_PATH):
 model = load_model(MODEL_PATH)
 
 # Define class names
-class_names = ['covid', 'normal']
+class_names = ['COVID', 'NORMAL']
 
 # App title
 st.title("AI COVID Lung Detection System")
