@@ -2,4 +2,5 @@ streamlit
 numpy
 Pillow
 tensorflow
+keras==3.8.0
 gdown
