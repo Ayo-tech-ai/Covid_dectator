@@ -19,11 +19,8 @@ if not os.path.exists(MODEL_PATH):
 # Load the model
 model = load_model(MODEL_PATH)
 
-# Load the model
-model = load_model("my2_cnn_lung_model.keras")
-
 # Define class names
-class_names = ['COVID', 'Normal']
+class_names = ['covid', 'normal']
 
 # App title
 st.title("AI COVID Lung Detection System")
